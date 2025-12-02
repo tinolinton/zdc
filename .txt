@@ -1,0 +1,71 @@
+this is an empty folder 
+
+I want to build a modern and practical app for helping students prep for their Zimbabwean Provisional Test (Driving)
+
+Your Task
+1. is to creata a fitting name for the project
+2. Create a detailed prompt for this project that will be used for Codex to generate a modern UI
+
+
+Project Requirement
+1. file structure in src folder /app sould include (admin), (site) and (auth)
+2. UI should support light and dark mode
+
+Technologies but not limitted to:
+1. Prisma v7
+2. Shadcnui components + sonner toaster
+3. Authjs
+4. Nextjs latest npm
+5. Routes should be protected using proxy.ts not middleware.ts
+6. Nodemailer
+
+App Logic and Functionalities
+1. (admin) 
+i. Should have a dashboard well structured with KPIs
+ii. Should be broken down into different pages 
+iii. Admin should be able to add, update, delete and view users
+iv. Admin should be able to add, update, delete and view questions
+v. Admin should be able to add, update, delete and view answers
+vi. to set custom tests
+vii. on pages where there have multiple functions break them into subpages for exampl on admin/questions page break it into admin/questions question lists, admin/questions/[id] for more details and editting , admin/questions/add for adding new questions to the directory
+viii. add bulk actions for questions and users
+iix. add search functionality for questions and users
+ix. add sorting pagination for questions and users
+x. admins should be able to check user tests results, and create custom tests using frequently failed questions
+
+2. (auth)
+i. should have a login page
+ii. should have a register page
+iii. should have a forgot password page
+iv. should have a reset password page
+v. verify email page
+
+3. (site)
+i. should redirect to login page if user is not logged in
+ii. homepage should have clickable cards for what tests to take
+iii. User dashboard should have a list of tests they have taken
+iv. Should have revision button after taking a test that pulls only the questions they have answered wrong
+
+
+(site) Tests Types & Logic
+1. Timed Tests these simulate how the real test is taken (each test should pick random 25 questions from the questions database and should have a timer of 10 minutes)
+2. Specialized Tests these are tests that are tailored can be for example specialized signage tests, diagram based tests etc (each test should pick random 25 questions from the questions database and should have a timer of 10 minutes)
+3. All these tests are multiple choices question with either 2 or 3 options (A, B and C)
+4. The results are shown after user answers all questions and submitted the test and are graded as a percentage with 22/25 as the minimum pass and 21/25 and below as Functionalities
+
+
+Schemas & database
+1. Use multiple dedicated prisma databases i.e Auth, Users, Questions
+2. Questions database: since these questions are multiple choice questions with either 2 or 3 options (A, B and C) the schema should be designed to handle this, some of the question may include images/diagrams, the should also include the multiple choice answers and the correct answer
+the answers should have unique ids and the correct answer should be marked as correct in the database
+to avoid users from cramming the correct answer option (A, B or C) the multiple choice answer should be shuffled each time the test is taken
+
+
+User Roles
+1. Superadmin (Full Access to Admin Settings and Site Settings)
+2. Admin (manage users, questions, tests)
+3. Users (take tests)
+4. admin & superadmins should have a verified badge
+
+
+only create a seed superadmin user with email dev@chimaliro.com, username linton
