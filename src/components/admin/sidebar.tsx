@@ -59,7 +59,7 @@ export function AdminSidebar() {
   return (
     <div
       className={cn(
-        "flex h-full flex-col border-r bg-gradient-to-b from-background to-muted/50 shadow-inner transition-all duration-300 ease-in-out",
+        "flex h-full flex-col border-r bg-linear-to-b from-background to-muted/50 shadow-inner transition-all duration-300 ease-in-out",
         isCollapsed ? "w-[72px]" : "w-64"
       )}
     >
@@ -111,7 +111,7 @@ export function AdminSidebar() {
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    "flex flex-col items-center gap-2 rounded-xl px-3 py-3 text-center transition-all hover:-translate-y-[1px] hover:bg-muted hover:text-foreground",
+                    "flex flex-col items-center gap-2 rounded-xl px-3 py-3 text-center transition-all hover:-translate-y-px hover:bg-muted hover:text-foreground",
                     isActive
                       ? "bg-primary/10 text-foreground ring-1 ring-primary/50"
                       : "text-muted-foreground"
