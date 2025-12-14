@@ -37,14 +37,26 @@ async function getQuestion(id: string): Promise<Question | null> {
   return data.question;
 }
 
+type ParamsInput = { id: string } | Promise<{ id: string }>;
+type SearchParamsInput = { page?: string } | Promise<{ page?: string }>;
+
+async function resolveParams(input: ParamsInput) {
+  return input instanceof Promise ? input : Promise.resolve(input);
+}
+
+async function resolveSearchParams(input?: SearchParamsInput) {
+  if (!input) return undefined;
+  return input instanceof Promise ? input : Promise.resolve(input);
+}
+
 export default async function EditQuestionPage({
   params,
   searchParams,
 }: {
-  params: { id: string };
-  searchParams?: { page?: string };
+  params: ParamsInput;
+  searchParams?: SearchParamsInput;
 }) {
-  const { id } = params;
+  const { id } = await resolveParams(params);
   if (!id) {
     notFound();
   }
@@ -55,7 +67,8 @@ export default async function EditQuestionPage({
     notFound();
   }
 
-  const returnPage = searchParams?.page;
+  const resolvedSearch = await resolveSearchParams(searchParams);
+  const returnPage = resolvedSearch?.page;
 
   return (
     <div className="space-y-6">
