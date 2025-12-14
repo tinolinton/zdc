@@ -20,6 +20,8 @@ type QuestionRow = {
   id: string;
   text: string;
   category: string | null;
+  orderIndex: number;
+  createdAt: string;
   updatedAt: string;
   answerCount: number;
   correctCount: number;
@@ -34,12 +36,14 @@ type QuestionResponse = {
 };
 
 const SORTS = [
+  { value: "orderIndex:asc", label: "Original (PDF/JSON order)" },
+  { value: "orderIndex:desc", label: "Original (reverse)" },
   { value: "updatedAt:desc", label: "Updated (newest)" },
   { value: "updatedAt:asc", label: "Updated (oldest)" },
   { value: "createdAt:desc", label: "Created (newest)" },
   { value: "createdAt:asc", label: "Created (oldest)" },
-  { value: "text:asc", label: "A → Z" },
-  { value: "text:desc", label: "Z → A" },
+  { value: "text:asc", label: "A -> Z" },
+  { value: "text:desc", label: "Z -> A" },
 ];
 
 async function fetchQuestions(params: {
@@ -79,7 +83,7 @@ export default function AdminQuestionsPage() {
   const [total, setTotal] = useState(0);
   const [take, setTake] = useState(25);
   const [search, setSearch] = useState("");
-  const [sort, setSort] = useState("updatedAt:desc");
+  const [sort, setSort] = useState("orderIndex:asc");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selected, setSelected] = useState<Set<string>>(new Set());

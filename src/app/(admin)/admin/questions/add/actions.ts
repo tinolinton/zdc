@@ -33,18 +33,27 @@ export async function createQuestionAction(payload: CreatePayload) {
   }
 
   try {
-    await prisma.question.create({
-      data: {
-        text: payload.text.trim(),
-        category: payload.category,
-        imageUrl: payload.imageUrl,
-        answers: {
-          create: payload.answers.map((a) => ({
-            text: a.text.trim(),
-            isCorrect: !!a.isCorrect,
-          })),
+    await prisma.$transaction(async (tx) => {
+      const lastQuestion = await tx.question.findFirst({
+        orderBy: { orderIndex: "desc" },
+        select: { orderIndex: true },
+      });
+      const nextOrderIndex = (lastQuestion?.orderIndex ?? 0) + 1;
+
+      await tx.question.create({
+        data: {
+          orderIndex: nextOrderIndex,
+          text: payload.text.trim(),
+          category: payload.category,
+          imageUrl: payload.imageUrl,
+          answers: {
+            create: payload.answers.map((a) => ({
+              text: a.text.trim(),
+              isCorrect: !!a.isCorrect,
+            })),
+          },
         },
-      },
+      });
     });
     return { ok: true };
   } catch (error) {

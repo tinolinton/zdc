@@ -18,8 +18,9 @@ export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const search = searchParams.get("search") ?? "";
   const pageParam = Number(searchParams.get("page") ?? 1);
-  const sort = searchParams.get("sort") ?? "updatedAt";
-  const order = (searchParams.get("order") ?? "desc").toLowerCase();
+  const sort = searchParams.get("sort") ?? "orderIndex";
+  const defaultOrder = sort === "orderIndex" ? "asc" : "desc";
+  const order = (searchParams.get("order") ?? defaultOrder).toLowerCase();
   const safePage = Math.max(1, pageParam);
 
   const where: Prisma.QuestionWhereInput | undefined = search
@@ -42,12 +43,17 @@ export async function GET(req: Request) {
     : undefined;
 
   const sortOrder = order === "asc" ? Prisma.SortOrder.asc : Prisma.SortOrder.desc;
-  const orderBy =
-    sort === "createdAt"
-      ? { createdAt: sortOrder }
-      : sort === "text"
-        ? { text: sortOrder }
-        : { updatedAt: sortOrder };
+  const orderBy: Prisma.QuestionOrderByWithRelationInput[] = [];
+  if (sort === "orderIndex") {
+    orderBy.push({ orderIndex: sortOrder });
+  } else if (sort === "createdAt") {
+    orderBy.push({ createdAt: sortOrder });
+  } else if (sort === "text") {
+    orderBy.push({ text: sortOrder });
+  } else {
+    orderBy.push({ updatedAt: sortOrder });
+  }
+  orderBy.push({ id: Prisma.SortOrder.asc });
 
   const [total, questions] = await Promise.all([
     prisma.question.count({ where }),
@@ -73,6 +79,7 @@ export async function GET(req: Request) {
       id: q.id,
       text: q.text,
       category: q.category,
+      orderIndex: q.orderIndex,
       createdAt: q.createdAt,
       updatedAt: q.updatedAt,
       answerCount: q.answers.length,

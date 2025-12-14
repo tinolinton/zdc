@@ -73,6 +73,7 @@ model Question {
   text      String
   imageUrl  String?
   category  String?
+  orderIndex Int     @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   answers   Answer[]

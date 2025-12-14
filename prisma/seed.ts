@@ -99,11 +99,12 @@ async function main() {
   await prisma.answer.deleteMany();
   await prisma.question.deleteMany();
 
-  const questionRecords = questions.map((question) => ({
+  const questionRecords = questions.map((question, index) => ({
     id: randomUUID(),
     text: question.text,
     imageUrl: null,
     category: null,
+    orderIndex: index + 1,
   }));
 
   const answerRecords = questionRecords.flatMap((question, index) =>
