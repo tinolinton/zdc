@@ -1,6 +1,7 @@
 import { auth } from "@/auth";
 import { proxy } from "@/lib/proxy";
 import { SiteNavbar } from "@/components/site/navbar";
+import { AnimatedBackground } from "@/components/site/animated-background";
 
 export default async function SiteLayout({
   children,
@@ -25,13 +26,14 @@ export default async function SiteLayout({
   ];
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-background text-foreground relative">
+      <AnimatedBackground />
       <SiteNavbar
         links={links}
         isAdmin={isAdmin}
         userName={session?.user?.name ?? session?.user?.email ?? ""}
       />
-      <main>{children}</main>
+      <main className="relative z-0">{children}</main>
     </div>
   );
 }

@@ -55,8 +55,7 @@ export default async function UserDashboard() {
     await getTests();
   const session = await auth();
   const role = session?.user?.role;
-  const isAdmin =
-    role === "ADMIN" || role === "SUPERADMIN";
+  const isAdmin = role === "ADMIN" || role === "SUPERADMIN";
 
   return (
     <div className="container mx-auto px-6 py-12 space-y-8">
@@ -76,17 +75,21 @@ export default async function UserDashboard() {
       </div>
 
       <div className="grid gap-6 md:grid-cols-3">
-        <Card>
+        <Card className="glass-card hover-lift transition-all border-primary/10 hover:border-primary/20 shadow-lg shadow-black/5 dark:shadow-black/20">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Tests Taken</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Tests Taken
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{testsTaken}</div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="glass-card hover-lift transition-all border-primary/10 hover:border-primary/20 shadow-lg shadow-black/5 dark:shadow-black/20">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Average Score</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Average Score
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
@@ -94,9 +97,11 @@ export default async function UserDashboard() {
             </div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="glass-card hover-lift transition-all border-primary/10 hover:border-primary/20 shadow-lg shadow-black/5 dark:shadow-black/20">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Last Test</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Last Test
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
@@ -111,7 +116,7 @@ export default async function UserDashboard() {
         </Card>
       </div>
 
-      <Card>
+      <Card className="glass-card border-primary/10 shadow-lg shadow-black/5 dark:shadow-black/20">
         <CardHeader>
           <CardTitle>Recent Tests</CardTitle>
         </CardHeader>
@@ -136,7 +141,8 @@ export default async function UserDashboard() {
                 results.map((result) => {
                   const percent = Math.round((result.score / 25) * 100);
                   const isPass =
-                    result.status.toUpperCase() === "PASS" || result.score >= 22;
+                    result.status.toUpperCase() === "PASS" ||
+                    result.score >= 22;
                   return (
                     <TableRow key={result.id}>
                       <TableCell>

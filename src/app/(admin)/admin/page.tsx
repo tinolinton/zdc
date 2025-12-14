@@ -127,12 +127,12 @@ export default async function AdminDashboard() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {cards.map((stat) => (
           <Link key={stat.title} href={stat.href ?? "#"} className="group">
-            <Card className="h-full transition-shadow group-hover:shadow-lg">
+            <Card className="h-full glass-card hover-lift transition-all duration-300 border-primary/10 group-hover:border-primary/20 shadow-lg shadow-black/5 dark:shadow-black/20">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
+                <CardTitle className="text-sm font-medium text-foreground/80 group-hover:text-primary transition-colors">
                   {stat.title}
                 </CardTitle>
-                <stat.icon className="h-4 w-4 text-muted-foreground" />
+                <stat.icon className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{stat.value}</div>

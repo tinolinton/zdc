@@ -17,6 +17,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "ZimDrive Coach",
   description: "Prep for the Zimbabwean Provisional Driving Test.",
+  icons: {
+    icon: "/logo/lx2.svg",
+  },
 };
 
 export default function RootLayout({

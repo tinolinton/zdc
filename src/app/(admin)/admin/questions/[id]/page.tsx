@@ -38,7 +38,9 @@ async function getQuestion(id: string): Promise<Question | null> {
 }
 
 type ParamsInput = { id: string } | Promise<{ id: string }>;
-type SearchParamsInput = { page?: string } | Promise<{ page?: string }>;
+type SearchParamsInput =
+  | { page?: string; search?: string; sort?: string }
+  | Promise<{ page?: string; search?: string; sort?: string }>;
 
 async function resolveParams(input: ParamsInput) {
   return input instanceof Promise ? input : Promise.resolve(input);
@@ -68,19 +70,31 @@ export default async function EditQuestionPage({
   }
 
   const resolvedSearch = await resolveSearchParams(searchParams);
-  const returnPage = resolvedSearch?.page;
+  const { page, search, sort } = resolvedSearch || {};
+  const backParams = new URLSearchParams();
+  if (page) backParams.set("page", page);
+  if (search) backParams.set("search", search);
+  if (sort) backParams.set("sort", sort);
+  const backUrl = backParams.toString()
+    ? `/admin/questions?${backParams.toString()}`
+    : "/admin/questions";
 
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <Link href={returnPage ? `/admin/questions?page=${returnPage}` : "/admin/questions"}>
+        <Link href={backUrl}>
           <Button variant="outline" size="icon">
             <ArrowLeft className="h-4 w-4" />
           </Button>
         </Link>
         <h1 className="text-3xl font-bold tracking-tight">Edit Question</h1>
       </div>
-      <QuestionEditor initialQuestion={question} returnPage={returnPage ?? null} />
+      <QuestionEditor
+        initialQuestion={question}
+        returnPage={page ?? null}
+        returnSearch={search ?? null}
+        returnSort={sort ?? null}
+      />
     </div>
   );
 }

@@ -30,7 +30,7 @@ const CATEGORY_OPTIONS = [
   { value: "Diagram", label: "Diagram" },
   { value: "Signage", label: "Signage" },
   { value: "Traffic Lights (Robots)", label: "Traffic Lights (Robots)" },
-  { value: "General Question", label: "General Question" },
+  { value: "Genearal Rule", label: "Genearal Rule" },
   { value: "other", label: "Other (enter custom)" },
 ];
 
@@ -51,7 +51,6 @@ export default function AddQuestionPage() {
   const [answers, setAnswers] = useState([
     { text: "", isCorrect: false },
     { text: "", isCorrect: false },
-    { text: "", isCorrect: false },
   ]);
   const [error, setError] = useState<string | null>(null);
 
@@ -65,6 +64,24 @@ export default function AddQuestionPage() {
     setAnswers((prev) =>
       prev.map((a, i) => ({ ...a, isCorrect: i === index }))
     );
+  };
+
+  const addAnswer = () => {
+    setAnswers((prev) => {
+      if (prev.length >= 3) return prev;
+      return [...prev, { text: "", isCorrect: false }];
+    });
+  };
+
+  const removeAnswer = (index: number) => {
+    setAnswers((prev) => {
+      if (prev.length <= 2) return prev;
+      const next = prev.filter((_, i) => i !== index);
+      if (!next.some((a) => a.isCorrect)) {
+        next[0] = { ...next[0], isCorrect: true };
+      }
+      return next;
+    });
   };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -148,8 +165,12 @@ export default function AddQuestionPage() {
       text: a.text.trim(),
     }));
 
-    if (preparedAnswers.length !== 3 || preparedAnswers.some((a) => !a.text)) {
-      toast.error("Provide exactly three answers with text.");
+    if (
+      preparedAnswers.length < 2 ||
+      preparedAnswers.length > 3 ||
+      preparedAnswers.some((a) => !a.text)
+    ) {
+      toast.error("Provide 2 or 3 answers, each with text.");
       return;
     }
 
@@ -295,9 +316,9 @@ export default function AddQuestionPage() {
                           key={img.public_id}
                           type="button"
                           onClick={() => setImageUrl(img.url)}
-                          className="group relative overflow-hidden rounded-lg border bg-gradient-to-br from-background to-muted shadow-sm transition hover:shadow-md focus:outline-none focus:ring-2 focus:ring-primary/50"
+                          className="group relative overflow-hidden rounded-lg border bg-linear-to-br from-background to-muted shadow-sm transition hover:shadow-md focus:outline-none focus:ring-2 focus:ring-primary/50"
                         >
-                          <div className="relative aspect-[4/3] w-full">
+                          <div className="relative aspect-4/3 w-full">
                             <Image
                               src={img.url}
                               alt="Gallery"
@@ -321,7 +342,7 @@ export default function AddQuestionPage() {
           <CardHeader>
             <CardTitle>Answers</CardTitle>
             <CardDescription>
-              Provide the multiple choice options and mark the correct one.
+              Provide 2-3 multiple choice options and mark the correct one.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -346,9 +367,25 @@ export default function AddQuestionPage() {
                     />
                     <Label>Correct</Label>
                   </div>
+                  {answers.length > 2 ? (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="self-start text-muted-foreground"
+                      onClick={() => removeAnswer(idx)}
+                    >
+                      Remove
+                    </Button>
+                  ) : null}
                 </div>
               ))}
             </div>
+            {answers.length < 3 ? (
+              <Button type="button" variant="outline" size="sm" onClick={addAnswer}>
+                Add optional third answer
+              </Button>
+            ) : null}
           </CardContent>
         </Card>
 

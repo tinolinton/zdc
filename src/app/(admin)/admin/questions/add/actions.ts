@@ -22,13 +22,21 @@ export async function createQuestionAction(payload: CreatePayload) {
 
   if (!payload.text.trim())
     return { ok: false, error: "Question text is required." };
+  const trimmedAnswers = payload.answers.map((a) => ({
+    ...a,
+    text: a.text.trim(),
+  }));
   if (
-    payload.answers.length !== 3 ||
-    payload.answers.some((a) => !a.text.trim())
+    trimmedAnswers.length < 2 ||
+    trimmedAnswers.length > 3 ||
+    trimmedAnswers.some((a) => !a.text)
   ) {
-    return { ok: false, error: "Provide exactly three answers with text." };
+    return {
+      ok: false,
+      error: "Provide 2 or 3 answers, each with text.",
+    };
   }
-  if (!payload.answers.some((a) => a.isCorrect)) {
+  if (!trimmedAnswers.some((a) => a.isCorrect)) {
     return { ok: false, error: "Mark at least one answer as correct." };
   }
 
@@ -47,8 +55,8 @@ export async function createQuestionAction(payload: CreatePayload) {
           category: payload.category,
           imageUrl: payload.imageUrl,
           answers: {
-            create: payload.answers.map((a) => ({
-              text: a.text.trim(),
+            create: trimmedAnswers.map((a) => ({
+              text: a.text,
               isCorrect: !!a.isCorrect,
             })),
           },

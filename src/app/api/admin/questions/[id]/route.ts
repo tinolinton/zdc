@@ -56,9 +56,7 @@ export async function PUT(
   const text: string | undefined = body?.text;
   const category: string | null | undefined = body?.category ?? null;
   const imageUrl: string | null | undefined = body?.imageUrl ?? null;
-  const answers: { text: string; isCorrect?: boolean }[] = Array.isArray(
-    body?.answers,
-  )
+  const answers: { text: string; isCorrect?: boolean }[] = Array.isArray(body?.answers)
     ? body.answers
     : [];
 
@@ -66,14 +64,24 @@ export async function PUT(
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
-  if (!text || answers.length !== 3) {
+  const trimmedText = text?.trim();
+  const trimmedAnswers = answers.map((a) => ({
+    ...a,
+    text: (a?.text ?? "").trim(),
+  }));
+  if (
+    !trimmedText ||
+    trimmedAnswers.length < 2 ||
+    trimmedAnswers.length > 3 ||
+    trimmedAnswers.some((a) => !a.text)
+  ) {
     return NextResponse.json(
-      { error: "Text and exactly three answers are required." },
+      { error: "Text and 2-3 answers (each with text) are required." },
       { status: 400 },
     );
   }
 
-  if (!answers.some((a) => a?.isCorrect)) {
+  if (!trimmedAnswers.some((a) => a?.isCorrect)) {
     return NextResponse.json(
       { error: "At least one answer must be marked correct." },
       { status: 400 },
@@ -90,11 +98,11 @@ export async function PUT(
     prisma.question.update({
       where: { id },
       data: {
-        text,
+        text: trimmedText,
         category,
         imageUrl,
         answers: {
-          create: answers.map((a) => ({
+          create: trimmedAnswers.map((a) => ({
             text: a.text,
             isCorrect: !!a.isCorrect,
           })),

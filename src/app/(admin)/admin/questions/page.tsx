@@ -14,7 +14,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Plus, Search, Trash2 } from "lucide-react";
 
 type QuestionRow = {
@@ -64,7 +70,11 @@ async function fetchQuestions(params: {
   return (await res.json()) as QuestionResponse;
 }
 
-async function deleteQuestions(payload: { ids?: string[]; all?: boolean; search?: string }) {
+async function deleteQuestions(payload: {
+  ids?: string[];
+  all?: boolean;
+  search?: string;
+}) {
   const res = await fetch("/api/admin/questions", {
     method: "DELETE",
     headers: { "Content-Type": "application/json" },
@@ -93,7 +103,8 @@ export default function AdminQuestionsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selected, setSelected] = useState<Set<string>>(new Set());
-  const hasLoadedOnce = useRef(false);
+  const hasLoadedInitial = useRef(false);
+  const hasHandledSearchSort = useRef(false);
 
   const offset = useMemo(() => (page - 1) * take, [page, take]);
   const pageNumbers = useMemo(() => {
@@ -138,7 +149,8 @@ export default function AdminQuestionsPage() {
       setTake(data.take);
       setSelected(new Set());
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Failed to load questions";
+      const msg =
+        err instanceof Error ? err.message : "Failed to load questions";
       setError(msg);
     } finally {
       setLoading(false);
@@ -146,15 +158,22 @@ export default function AdminQuestionsPage() {
   };
 
   useEffect(() => {
-    if (!hasLoadedOnce.current) {
-      hasLoadedOnce.current = true;
-      load(initialPage);
+    hasLoadedInitial.current = true;
+    load(initialPage);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialPage]);
+
+  useEffect(() => {
+    // Reset to first page when search or sort changes
+    if (!hasLoadedInitial.current) return;
+    if (!hasHandledSearchSort.current) {
+      hasHandledSearchSort.current = true;
       return;
     }
     setPage(1);
     load(1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search, sort, initialPage]);
+  }, [search, sort]);
 
   const toggleSelectAll = (checked: boolean) => {
     if (checked) {
@@ -197,11 +216,20 @@ export default function AdminQuestionsPage() {
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h1 className="text-3xl font-bold tracking-tight">Questions</h1>
         <div className="flex gap-2">
-          <Button variant="destructive" size="sm" disabled={selected.size === 0} onClick={() => onBulkDelete(false)}>
+          <Button
+            variant="destructive"
+            size="sm"
+            disabled={selected.size === 0}
+            onClick={() => onBulkDelete(false)}
+          >
             <Trash2 className="mr-2 h-4 w-4" />
             Delete Selected
           </Button>
-          <Button variant="outline" size="sm" onClick={() => onBulkDelete(true)}>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onBulkDelete(true)}
+          >
             Delete All (filter)
           </Button>
           <Button asChild>
@@ -239,8 +267,8 @@ export default function AdminQuestionsPage() {
       </div>
 
       <div className="text-sm text-muted-foreground">
-        Showing {total === 0 ? 0 : offset + 1}-
-        {Math.min(offset + take, total)} of {total}
+        Showing {total === 0 ? 0 : offset + 1}-{Math.min(offset + take, total)}{" "}
+        of {total}
       </div>
 
       <div className="rounded-md border overflow-hidden">
@@ -249,7 +277,9 @@ export default function AdminQuestionsPage() {
             <TableRow>
               <TableHead className="w-12">
                 <Checkbox
-                  checked={selected.size === questions.length && questions.length > 0}
+                  checked={
+                    selected.size === questions.length && questions.length > 0
+                  }
                   onCheckedChange={(c) => toggleSelectAll(Boolean(c))}
                   aria-label="Select all"
                 />
@@ -270,7 +300,10 @@ export default function AdminQuestionsPage() {
               </TableRow>
             ) : error ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center text-sm text-red-600">
+                <TableCell
+                  colSpan={6}
+                  className="text-center text-sm text-red-600"
+                >
                   {error}
                 </TableCell>
               </TableRow>
@@ -283,13 +316,18 @@ export default function AdminQuestionsPage() {
             ) : (
               questions.map((question, idx) => {
                 const rowNumber = offset + idx + 1;
-                const truncated = question.text.length > 120 ? question.text.slice(0, 120) + "…" : question.text;
+                const truncated =
+                  question.text.length > 120
+                    ? question.text.slice(0, 120) + "…"
+                    : question.text;
                 return (
                   <TableRow key={question.id} className="hover:bg-muted/40">
                     <TableCell>
                       <Checkbox
                         checked={selected.has(question.id)}
-                        onCheckedChange={(c) => toggleSelect(question.id, Boolean(c))}
+                        onCheckedChange={(c) =>
+                          toggleSelect(question.id, Boolean(c))
+                        }
                         aria-label={`Select question ${rowNumber}`}
                       />
                     </TableCell>
@@ -298,7 +336,11 @@ export default function AdminQuestionsPage() {
                     </TableCell>
                     <TableCell className="max-w-xs">
                       <Link
-                        href={`/admin/questions/${question.id}?page=${page}`}
+                        href={`/admin/questions/${
+                          question.id
+                        }?page=${page}&search=${encodeURIComponent(
+                          search
+                        )}&sort=${sort}`}
                         className="block truncate underline underline-offset-2"
                         title={question.text}
                       >
@@ -309,7 +351,8 @@ export default function AdminQuestionsPage() {
                       {question.category ?? "Uncategorized"}
                     </TableCell>
                     <TableCell className="whitespace-nowrap">
-                      {question.answerCount} total / {question.correctCount} correct
+                      {question.answerCount} total / {question.correctCount}{" "}
+                      correct
                     </TableCell>
                     <TableCell className="whitespace-nowrap">
                       {new Date(question.updatedAt).toLocaleDateString()}
@@ -327,7 +370,12 @@ export default function AdminQuestionsPage() {
           Page {page} of {totalPages}
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={() => load(page - 1)} disabled={page <= 1}>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => load(page - 1)}
+            disabled={page <= 1}
+          >
             Previous
           </Button>
           <div className="flex items-center gap-1">
@@ -343,13 +391,21 @@ export default function AdminQuestionsPage() {
                   {p}
                 </Button>
               ) : (
-                <span key={`ellipsis-${idx}`} className="px-2 text-muted-foreground">
+                <span
+                  key={`ellipsis-${idx}`}
+                  className="px-2 text-muted-foreground"
+                >
                   {p}
                 </span>
               )
             )}
           </div>
-          <Button variant="outline" size="sm" onClick={() => load(page + 1)} disabled={page >= totalPages}>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => load(page + 1)}
+            disabled={page >= totalPages}
+          >
             Next
           </Button>
         </div>

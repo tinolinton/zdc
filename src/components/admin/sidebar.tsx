@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
@@ -59,25 +60,41 @@ export function AdminSidebar() {
   return (
     <div
       className={cn(
-        "flex h-full flex-col border-r bg-linear-to-b from-background to-muted/50 shadow-inner transition-all duration-300 ease-in-out",
+        "hidden md:flex h-full flex-col bg-sidebar/80 backdrop-blur-xl border-r border-sidebar-border/50 shadow-xl transition-all duration-300 ease-in-out",
         isCollapsed ? "w-[72px]" : "w-64"
       )}
     >
-      <div className="flex h-14 items-center border-b px-4">
-        <div
+      {/* Logo Header */}
+      <div className="flex h-16 items-center border-b border-sidebar-border/50 px-4">
+        <Link
+          href="/admin"
           className={cn(
-            "flex w-full items-center justify-between rounded-md bg-muted/60 px-3 py-2 text-sm font-semibold tracking-tight",
-            isCollapsed ? "justify-center" : ""
+            "flex items-center gap-3 transition-all duration-300",
+            isCollapsed ? "justify-center w-full" : ""
           )}
         >
-          {isCollapsed ? "ZP" : "ZimProvisional Admin"}
-        </div>
+          <div className="relative h-10 w-10 shrink-0">
+            <Image
+              src="/logo/lx2.svg"
+              alt="ZimDrive Coach"
+              fill
+              className="object-contain"
+            />
+          </div>
+          {!isCollapsed && (
+            <span className="font-semibold text-sm tracking-tight text-sidebar-foreground">
+              Admin Panel
+            </span>
+          )}
+        </Link>
       </div>
+
+      {/* Navigation */}
       <div className="flex-1 overflow-auto py-4">
         <TooltipProvider>
           <nav
             className={cn(
-              "flex flex-col gap-2 px-2 text-sm font-medium",
+              "flex flex-col gap-1.5 px-3 text-sm font-medium",
               isCollapsed ? "items-center" : ""
             )}
           >
@@ -89,20 +106,17 @@ export function AdminSidebar() {
                     <Link
                       href={item.href}
                       className={cn(
-                        "flex h-10 w-10 items-center justify-center rounded-lg transition-colors hover:bg-muted hover:text-foreground",
+                        "flex h-10 w-10 items-center justify-center rounded-xl transition-all duration-200",
                         isActive
-                          ? "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground"
-                          : "text-muted-foreground"
+                          ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-lg"
+                          : "text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                       )}
                     >
                       <item.icon className="h-5 w-5" />
                       <span className="sr-only">{item.title}</span>
                     </Link>
                   </TooltipTrigger>
-                  <TooltipContent
-                    side="right"
-                    className="flex items-center gap-4"
-                  >
+                  <TooltipContent side="right" className="glass-popover">
                     {item.title}
                   </TooltipContent>
                 </Tooltip>
@@ -111,21 +125,23 @@ export function AdminSidebar() {
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    "flex flex-col items-center gap-2 rounded-xl px-3 py-3 text-center transition-all hover:-translate-y-px hover:bg-muted hover:text-foreground",
+                    "flex items-center gap-3 rounded-xl px-3 py-2.5 transition-all duration-200",
                     isActive
-                      ? "bg-primary/10 text-foreground ring-1 ring-primary/50"
-                      : "text-muted-foreground"
+                      ? "bg-sidebar-primary/10 text-sidebar-foreground shadow-sm ring-1 ring-sidebar-primary/20"
+                      : "text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                   )}
                 >
-                  <item.icon className="h-5 w-5" />
-                  <span className="text-xs font-medium">{item.title}</span>
+                  <item.icon className="h-5 w-5 shrink-0" />
+                  <span className="text-sm font-medium">{item.title}</span>
                 </Link>
               );
             })}
           </nav>
         </TooltipProvider>
       </div>
-      <div className="border-t p-3 space-y-3">
+
+      {/* Footer */}
+      <div className="border-t border-sidebar-border/50 p-3 space-y-2">
         <TooltipProvider>
           <div className={cn("flex", isCollapsed ? "justify-center" : "")}>
             {isCollapsed ? (
@@ -134,19 +150,21 @@ export function AdminSidebar() {
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-9 w-9"
+                    className="h-10 w-10 rounded-xl text-sidebar-foreground/70 hover:bg-destructive/10 hover:text-destructive"
                     onClick={() => signOut()}
                   >
                     <LogOut className="h-4 w-4" />
                     <span className="sr-only">Sign Out</span>
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent side="right">Sign Out</TooltipContent>
+                <TooltipContent side="right" className="glass-popover">
+                  Sign Out
+                </TooltipContent>
               </Tooltip>
             ) : (
               <Button
                 variant="ghost"
-                className="w-full justify-center gap-3 text-muted-foreground hover:text-primary"
+                className="w-full justify-start gap-3 rounded-xl text-sidebar-foreground/70 hover:bg-destructive/10 hover:text-destructive"
                 onClick={() => signOut()}
               >
                 <LogOut className="h-4 w-4" />
@@ -155,26 +173,23 @@ export function AdminSidebar() {
             )}
           </div>
         </TooltipProvider>
+
+        {/* Collapse Toggle */}
         <div
-          className={cn(
-            "flex",
-            isCollapsed ? "justify-center" : "justify-end"
-          )}
+          className={cn("flex", isCollapsed ? "justify-center" : "justify-end")}
         >
           <Button
             variant="ghost"
+            size="icon"
             onClick={() => setIsCollapsed(!isCollapsed)}
             className={cn(
-              "border shadow-sm transition-all",
-              isCollapsed
-                ? "h-9 w-9 rounded-full bg-muted"
-                : "h-10 w-full justify-center gap-2 rounded-lg bg-primary/10 hover:bg-primary/20"
+              "h-8 w-8 rounded-lg border border-sidebar-border/50 bg-sidebar-accent/50 text-sidebar-foreground/70 transition-all hover:bg-sidebar-accent"
             )}
           >
             {isCollapsed ? (
-              <ChevronRight className="h-3 w-3" />
+              <ChevronRight className="h-4 w-4" />
             ) : (
-              <ChevronLeft className="h-3 w-3" />
+              <ChevronLeft className="h-4 w-4" />
             )}
             <span className="sr-only">Toggle Sidebar</span>
           </Button>
