@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { updateQuestionAction } from "./actions";
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
+import { X } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -69,6 +70,17 @@ export default function QuestionEditor({ initialQuestion }: QuestionEditorProps)
 
   const setCorrectIndex = (index: number) => {
     setAnswers((prev) => prev.map((a, i) => ({ ...a, isCorrect: i === index })));
+  };
+
+  const removeAnswer = (index: number) => {
+    setAnswers((prev) => {
+      if (prev.length <= 3) return prev;
+      const next = prev.filter((_, i) => i !== index);
+      if (!next.some((a) => a.isCorrect)) {
+        next[0] = { ...next[0], isCorrect: true };
+      }
+      return next;
+    });
   };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -315,6 +327,9 @@ export default function QuestionEditor({ initialQuestion }: QuestionEditorProps)
       </div>
       <div className="space-y-2">
         <p className="text-sm text-muted-foreground">Answers</p>
+        <p className="text-xs text-muted-foreground">
+          Keep exactly three answers. Remove extras below if present.
+        </p>
         <div className="space-y-2">
           {answers.map((answer, idx) => (
             <div
@@ -333,6 +348,18 @@ export default function QuestionEditor({ initialQuestion }: QuestionEditorProps)
                 value={answer.text}
                 onChange={(e) => updateAnswerText(idx, e.target.value)}
               />
+              {answers.length > 3 ? (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 text-muted-foreground"
+                  onClick={() => removeAnswer(idx)}
+                  aria-label={`Remove answer ${idx + 1}`}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              ) : null}
             </div>
           ))}
         </div>
