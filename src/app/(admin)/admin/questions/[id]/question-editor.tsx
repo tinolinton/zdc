@@ -29,9 +29,10 @@ const CATEGORY_OPTIONS = [
 
 type QuestionEditorProps = {
   initialQuestion: Question;
+  returnPage?: string | null;
 };
 
-export default function QuestionEditor({ initialQuestion }: QuestionEditorProps) {
+export default function QuestionEditor({ initialQuestion, returnPage }: QuestionEditorProps) {
   const router = useRouter();
   const [text, setText] = useState(initialQuestion.text);
   const [category, setCategory] = useState<string>(() => {
@@ -210,7 +211,8 @@ export default function QuestionEditor({ initialQuestion }: QuestionEditorProps)
 
       setSuccess("Question updated.");
       toast.success("Question saved");
-      router.push("/admin/questions");
+      const backTo = returnPage ? `/admin/questions?page=${returnPage}` : "/admin/questions";
+      router.push(backTo);
     });
   };
 
@@ -370,7 +372,7 @@ export default function QuestionEditor({ initialQuestion }: QuestionEditorProps)
         <p className="text-sm text-green-600">{success}</p>
       ) : null}
       <div className="flex justify-end gap-3">
-        <Link href="/admin/questions">
+        <Link href={returnPage ? `/admin/questions?page=${returnPage}` : "/admin/questions"}>
           <Button variant="outline">Cancel</Button>
         </Link>
         <Button onClick={onSave} disabled={isPending}>

@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -78,7 +79,12 @@ async function deleteQuestions(payload: { ids?: string[]; all?: boolean; search?
 
 export default function AdminQuestionsPage() {
   const [questions, setQuestions] = useState<QuestionRow[]>([]);
-  const [page, setPage] = useState(1);
+  const searchParams = useSearchParams();
+  const initialPage = useMemo(() => {
+    const value = Number(searchParams.get("page") ?? "1");
+    return Number.isFinite(value) && value > 0 ? value : 1;
+  }, [searchParams]);
+  const [page, setPage] = useState(initialPage);
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
   const [take, setTake] = useState(25);
@@ -87,6 +93,7 @@ export default function AdminQuestionsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selected, setSelected] = useState<Set<string>>(new Set());
+  const hasLoadedOnce = useRef(false);
 
   const offset = useMemo(() => (page - 1) * take, [page, take]);
   const pageNumbers = useMemo(() => {
@@ -118,8 +125,9 @@ export default function AdminQuestionsPage() {
     setLoading(true);
     setError(null);
     try {
+      const targetPage = pageOverride ?? page;
       const data = await fetchQuestions({
-        page: pageOverride ?? page,
+        page: targetPage,
         search,
         sort,
       });
@@ -138,9 +146,15 @@ export default function AdminQuestionsPage() {
   };
 
   useEffect(() => {
+    if (!hasLoadedOnce.current) {
+      hasLoadedOnce.current = true;
+      load(initialPage);
+      return;
+    }
+    setPage(1);
     load(1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search, sort]);
+  }, [search, sort, initialPage]);
 
   const toggleSelectAll = (checked: boolean) => {
     if (checked) {
@@ -284,7 +298,7 @@ export default function AdminQuestionsPage() {
                     </TableCell>
                     <TableCell className="max-w-xs">
                       <Link
-                        href={`/admin/questions/${question.id}`}
+                        href={`/admin/questions/${question.id}?page=${page}`}
                         className="block truncate underline underline-offset-2"
                         title={question.text}
                       >

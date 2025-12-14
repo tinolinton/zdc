@@ -39,10 +39,12 @@ async function getQuestion(id: string): Promise<Question | null> {
 
 export default async function EditQuestionPage({
   params,
+  searchParams,
 }: {
-  params: Promise<{ id: string }>;
+  params: { id: string };
+  searchParams?: { page?: string };
 }) {
-  const { id } = await params;
+  const { id } = params;
   if (!id) {
     notFound();
   }
@@ -53,17 +55,19 @@ export default async function EditQuestionPage({
     notFound();
   }
 
+  const returnPage = searchParams?.page;
+
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <Link href="/admin/questions">
+        <Link href={returnPage ? `/admin/questions?page=${returnPage}` : "/admin/questions"}>
           <Button variant="outline" size="icon">
             <ArrowLeft className="h-4 w-4" />
           </Button>
         </Link>
         <h1 className="text-3xl font-bold tracking-tight">Edit Question</h1>
       </div>
-      <QuestionEditor initialQuestion={question} />
+      <QuestionEditor initialQuestion={question} returnPage={returnPage ?? null} />
     </div>
   );
 }
