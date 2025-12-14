@@ -26,11 +26,20 @@ import { toast } from "sonner";
 import { createQuestionAction } from "./actions";
 import Image from "next/image";
 
+const CATEGORY_OPTIONS = [
+  { value: "Diagram", label: "Diagram" },
+  { value: "Signage", label: "Signage" },
+  { value: "Traffic Lights (Robots)", label: "Traffic Lights (Robots)" },
+  { value: "General Question", label: "General Question" },
+  { value: "other", label: "Other (enter custom)" },
+];
+
 export default function AddQuestionPage() {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [text, setText] = useState("");
   const [category, setCategory] = useState("");
+  const [customCategory, setCustomCategory] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [uploading, setUploading] = useState(false);
   const [galleryOpen, setGalleryOpen] = useState(false);
@@ -149,10 +158,18 @@ export default function AddQuestionPage() {
       return;
     }
 
+    const resolvedCategory =
+      category === "other" ? customCategory.trim() : category.trim();
+
+    if (category === "other" && !resolvedCategory) {
+      toast.error("Enter a custom category or pick one from the list.");
+      return;
+    }
+
     startTransition(async () => {
       const result = await createQuestionAction({
         text: trimmedText,
-        category: category || null,
+        category: resolvedCategory || null,
         imageUrl: imageUrl || null,
         answers: preparedAnswers,
       });
@@ -190,16 +207,31 @@ export default function AddQuestionPage() {
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="category">Category</Label>
-              <Select value={category} onValueChange={setCategory}>
+              <Select
+                value={category}
+                onValueChange={(v) => {
+                  setCategory(v);
+                  if (v !== "other") setCustomCategory("");
+                }}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Select category" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="general">General Rules</SelectItem>
-                  <SelectItem value="signage">Signage</SelectItem>
-                  <SelectItem value="diagram">Diagrams</SelectItem>
+                  {CATEGORY_OPTIONS.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
+              {category === "other" ? (
+                <Input
+                  value={customCategory}
+                  onChange={(e) => setCustomCategory(e.target.value)}
+                  placeholder="Enter category name"
+                />
+              ) : null}
             </div>
             <div className="space-y-2">
               <Label htmlFor="question">Question Text</Label>
@@ -257,23 +289,24 @@ export default function AddQuestionPage() {
                     ) : null}
                   </div>
                   {galleryOpen && galleryImages.length > 0 ? (
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-64 overflow-auto border rounded p-2">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 max-h-72 overflow-auto rounded border bg-muted/40 p-3">
                       {galleryImages.map((img) => (
                         <button
                           key={img.public_id}
                           type="button"
                           onClick={() => setImageUrl(img.url)}
-                          className="group relative rounded border focus:outline-none focus:ring-2 focus:ring-primary/50"
+                          className="group relative overflow-hidden rounded-lg border bg-gradient-to-br from-background to-muted shadow-sm transition hover:shadow-md focus:outline-none focus:ring-2 focus:ring-primary/50"
                         >
-                          <Image
-                            src={img.url}
-                            alt="Gallery"
-                            width={400}
-                            height={400}
-                            className="h-28 w-full rounded object-cover"
-                            sizes="200px"
-                          />
-                          <span className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition" />
+                          <div className="relative aspect-[4/3] w-full">
+                            <Image
+                              src={img.url}
+                              alt="Gallery"
+                              fill
+                              className="object-contain p-2 transition duration-200 group-hover:scale-105"
+                              sizes="(max-width: 768px) 45vw, 240px"
+                            />
+                          </div>
+                          <span className="absolute inset-0 bg-black/10 opacity-0 transition group-hover:opacity-100" />
                         </button>
                       ))}
                     </div>

@@ -9,6 +9,22 @@ import { toast } from "sonner";
 import { updateQuestionAction } from "./actions";
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+
+const CATEGORY_OPTIONS = [
+  { value: "Diagram", label: "Diagram" },
+  { value: "Signage", label: "Signage" },
+  { value: "Traffic Lights (Robots)", label: "Traffic Lights (Robots)" },
+  { value: "General Question", label: "General Question" },
+  { value: "other", label: "Other (enter custom)" },
+];
 
 type QuestionEditorProps = {
   initialQuestion: Question;
@@ -17,7 +33,17 @@ type QuestionEditorProps = {
 export default function QuestionEditor({ initialQuestion }: QuestionEditorProps) {
   const router = useRouter();
   const [text, setText] = useState(initialQuestion.text);
-  const [category, setCategory] = useState(initialQuestion.category ?? "");
+  const [category, setCategory] = useState<string>(() => {
+    const current = initialQuestion.category ?? "";
+    const match = CATEGORY_OPTIONS.find((c) => c.value === current);
+    if (current && !match) return "other";
+    return current;
+  });
+  const [customCategory, setCustomCategory] = useState<string>(() => {
+    const current = initialQuestion.category ?? "";
+    const match = CATEGORY_OPTIONS.find((c) => c.value === current);
+    return current && !match ? current : "";
+  });
   const [imageUrl, setImageUrl] = useState(initialQuestion.imageUrl ?? "");
   const [uploading, setUploading] = useState(false);
   const [galleryOpen, setGalleryOpen] = useState(false);
@@ -145,10 +171,20 @@ export default function QuestionEditor({ initialQuestion }: QuestionEditorProps)
     }
 
     startTransition(async () => {
+      const resolvedCategory =
+        category === "other" ? customCategory.trim() : category.trim();
+
+      if (category === "other" && !resolvedCategory) {
+        const msg = "Enter a custom category or pick one from the list.";
+        setError(msg);
+        toast.error(msg);
+        return;
+      }
+
       const result = await updateQuestionAction({
         id: initialQuestion.id,
         text: trimmedText,
-        category: category || null,
+        category: resolvedCategory || null,
         imageUrl: imageUrl || null,
         answers: preparedAnswers,
       });
@@ -218,43 +254,64 @@ export default function QuestionEditor({ initialQuestion }: QuestionEditorProps)
               >
                 {galleryLoading ? "Loading..." : "Choose from Gallery"}
               </Button>
-              {galleryError ? (
-                <p className="text-xs text-red-600">{galleryError}</p>
-              ) : null}
-            </div>
-                {galleryOpen && galleryImages.length > 0 ? (
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-64 overflow-auto border rounded p-2">
-                    {galleryImages.map((img) => (
-                      <button
-                        key={img.public_id}
-                        type="button"
-                        onClick={() => setImageUrl(img.url)}
-                        className="group relative rounded border focus:outline-none focus:ring-2 focus:ring-primary/50"
-                      >
-                        <Image
-                          src={img.url}
-                          alt="Gallery"
-                          width={400}
-                          height={400}
-                          className="h-28 w-full rounded object-cover"
-                          sizes="200px"
-                        />
-                        <span className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition" />
-                      </button>
-                    ))}
-                  </div>
+            {galleryError ? (
+              <p className="text-xs text-red-600">{galleryError}</p>
+            ) : null}
+          </div>
+            {galleryOpen && galleryImages.length > 0 ? (
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 max-h-72 overflow-auto rounded border bg-muted/40 p-3">
+                {galleryImages.map((img) => (
+                  <button
+                    key={img.public_id}
+                    type="button"
+                    onClick={() => setImageUrl(img.url)}
+                    className="group relative overflow-hidden rounded-lg border bg-gradient-to-br from-background to-muted shadow-sm transition hover:shadow-md focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  >
+                    <div className="relative aspect-[4/3] w-full">
+                      <Image
+                        src={img.url}
+                        alt="Gallery"
+                        fill
+                        className="object-contain p-2 transition duration-200 group-hover:scale-105"
+                        sizes="(max-width: 768px) 45vw, 240px"
+                      />
+                    </div>
+                    <span className="absolute inset-0 bg-black/10 opacity-0 transition group-hover:opacity-100" />
+                  </button>
+                ))}
+              </div>
             ) : null}
           </div>
         )}
       </div>
       <div className="space-y-1">
-        <p className="text-sm text-muted-foreground">Category</p>
-        <input
-          className="w-full rounded border bg-background p-2 text-sm"
+        <Label className="text-sm text-muted-foreground">Category</Label>
+        <Select
           value={category}
-          onChange={(e) => setCategory(e.target.value)}
-          placeholder="Optional"
-        />
+          onValueChange={(v) => {
+            setCategory(v);
+            if (v !== "other") setCustomCategory("");
+          }}
+        >
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Select category" />
+          </SelectTrigger>
+          <SelectContent>
+            {CATEGORY_OPTIONS.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        {category === "other" ? (
+          <Input
+            className="w-full rounded border bg-background p-2 text-sm"
+            value={customCategory}
+            onChange={(e) => setCustomCategory(e.target.value)}
+            placeholder="Enter category name"
+          />
+        ) : null}
       </div>
       <div className="space-y-2">
         <p className="text-sm text-muted-foreground">Answers</p>

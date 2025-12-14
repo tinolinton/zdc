@@ -89,6 +89,30 @@ export default function AdminQuestionsPage() {
   const [selected, setSelected] = useState<Set<string>>(new Set());
 
   const offset = useMemo(() => (page - 1) * take, [page, take]);
+  const pageNumbers = useMemo(() => {
+    const pages: Array<number | string> = [];
+    if (totalPages <= 7) {
+      for (let i = 1; i <= totalPages; i += 1) pages.push(i);
+      return pages;
+    }
+
+    const addRange = (start: number, end: number) => {
+      for (let i = start; i <= end; i += 1) pages.push(i);
+    };
+
+    pages.push(1);
+
+    const start = Math.max(2, page - 1);
+    const end = Math.min(totalPages - 1, page + 1);
+
+    if (start > 2) pages.push("…");
+    addRange(start, end);
+    if (end < totalPages - 1) pages.push("…");
+
+    pages.push(totalPages);
+
+    return pages;
+  }, [page, totalPages]);
 
   const load = async (pageOverride?: number) => {
     setLoading(true);
@@ -288,10 +312,29 @@ export default function AdminQuestionsPage() {
         <div>
           Page {page} of {totalPages}
         </div>
-        <div className="flex gap-2">
+        <div className="flex items-center gap-2">
           <Button variant="outline" size="sm" onClick={() => load(page - 1)} disabled={page <= 1}>
             Previous
           </Button>
+          <div className="flex items-center gap-1">
+            {pageNumbers.map((p, idx) =>
+              typeof p === "number" ? (
+                <Button
+                  key={`page-${p}-${idx}`}
+                  size="sm"
+                  variant={p === page ? "default" : "outline"}
+                  onClick={() => load(p)}
+                  aria-label={`Go to page ${p}`}
+                >
+                  {p}
+                </Button>
+              ) : (
+                <span key={`ellipsis-${idx}`} className="px-2 text-muted-foreground">
+                  {p}
+                </span>
+              )
+            )}
+          </div>
           <Button variant="outline" size="sm" onClick={() => load(page + 1)} disabled={page >= totalPages}>
             Next
           </Button>
