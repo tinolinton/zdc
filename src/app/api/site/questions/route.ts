@@ -1,5 +1,6 @@
 import { auth } from "@/auth";
 import prisma from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 import { NextResponse } from "next/server";
 
 export async function GET(req: Request) {
@@ -11,9 +12,41 @@ export async function GET(req: Request) {
 
   const { searchParams } = new URL(req.url);
   const requestedTake = Number(searchParams.get("take") ?? 25);
+  const type = (searchParams.get("type") ?? "timed").toLowerCase();
+  const categoriesParam = searchParams.get("categories");
+  const categories =
+    categoriesParam
+      ?.split(",")
+      .map((c) => c.trim())
+      .filter(Boolean) ?? [];
+
+  const signageFilter: { contains: string; mode: "insensitive" } = {
+    contains: "sign",
+    mode: "insensitive",
+  };
+  const diagramFilter: { contains: string; mode: "insensitive" } = {
+    contains: "diagram",
+    mode: "insensitive",
+  };
+
+  let where: Prisma.QuestionWhereInput | undefined;
+
+  if (categories.length) {
+    where = { category: { in: categories } };
+  } else if (type === "signage") {
+    where = { category: signageFilter };
+  } else if (type === "diagrams" || type === "diagram") {
+    where = { category: diagramFilter };
+  } else if (type === "specialized") {
+    where = {
+      category: { not: null },
+      NOT: [{ category: signageFilter }, { category: diagramFilter }],
+    };
+  }
 
   // Fetch all question ids to allow random selection without repeats
   const allIds = await prisma.question.findMany({
+    where,
     select: { id: true },
   });
 

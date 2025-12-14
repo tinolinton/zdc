@@ -55,7 +55,18 @@ const sidebarItems = [
 
 export function AdminSidebar() {
   const pathname = usePathname();
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const SIDEBAR_STATE_KEY = "adminSidebarCollapsed";
+  const [isCollapsed, setIsCollapsed] = useState(() => {
+    if (typeof window === "undefined") return false;
+    const stored = window.localStorage.getItem(SIDEBAR_STATE_KEY);
+    return stored === "true";
+  });
+  const activeLinkClasses =
+    "bg-sidebar-primary text-sidebar-primary-foreground shadow-lg shadow-sidebar-primary/30";
+  const inactiveLinkClasses =
+    "text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground";
+
+  const handleSignOut = () => signOut({ callbackUrl: "/login" });
 
   return (
     <div
@@ -81,11 +92,6 @@ export function AdminSidebar() {
               className="object-contain"
             />
           </div>
-          {!isCollapsed && (
-            <span className="font-semibold text-sm tracking-tight text-sidebar-foreground">
-              Admin Panel
-            </span>
-          )}
         </Link>
       </div>
 
@@ -107,9 +113,7 @@ export function AdminSidebar() {
                       href={item.href}
                       className={cn(
                         "flex h-10 w-10 items-center justify-center rounded-xl transition-all duration-200",
-                        isActive
-                          ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-lg"
-                          : "text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                        isActive ? activeLinkClasses : inactiveLinkClasses
                       )}
                     >
                       <item.icon className="h-5 w-5" />
@@ -125,10 +129,8 @@ export function AdminSidebar() {
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    "flex items-center gap-3 rounded-xl px-3 py-2.5 transition-all duration-200",
-                    isActive
-                      ? "bg-sidebar-primary/10 text-sidebar-foreground shadow-sm ring-1 ring-sidebar-primary/20"
-                      : "text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                    "flex w-full items-center justify-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200",
+                    isActive ? activeLinkClasses : inactiveLinkClasses
                   )}
                 >
                   <item.icon className="h-5 w-5 shrink-0" />
@@ -151,7 +153,7 @@ export function AdminSidebar() {
                     variant="ghost"
                     size="icon"
                     className="h-10 w-10 rounded-xl text-sidebar-foreground/70 hover:bg-destructive/10 hover:text-destructive"
-                    onClick={() => signOut()}
+                    onClick={handleSignOut}
                   >
                     <LogOut className="h-4 w-4" />
                     <span className="sr-only">Sign Out</span>
@@ -164,8 +166,8 @@ export function AdminSidebar() {
             ) : (
               <Button
                 variant="ghost"
-                className="w-full justify-start gap-3 rounded-xl text-sidebar-foreground/70 hover:bg-destructive/10 hover:text-destructive"
-                onClick={() => signOut()}
+                className="w-full justify-center gap-3 rounded-xl text-sidebar-foreground/70 hover:bg-destructive/10 hover:text-destructive"
+                onClick={handleSignOut}
               >
                 <LogOut className="h-4 w-4" />
                 Sign Out
@@ -175,24 +177,45 @@ export function AdminSidebar() {
         </TooltipProvider>
 
         {/* Collapse Toggle */}
-        <div
-          className={cn("flex", isCollapsed ? "justify-center" : "justify-end")}
-        >
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setIsCollapsed(!isCollapsed)}
-            className={cn(
-              "h-8 w-8 rounded-lg border border-sidebar-border/50 bg-sidebar-accent/50 text-sidebar-foreground/70 transition-all hover:bg-sidebar-accent"
-            )}
-          >
-            {isCollapsed ? (
+        <div className={cn("flex", isCollapsed ? "justify-center" : "")}>
+          {isCollapsed ? (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => {
+                const next = !isCollapsed;
+                setIsCollapsed(next);
+                if (typeof window !== "undefined") {
+                  window.localStorage.setItem(
+                    SIDEBAR_STATE_KEY,
+                    String(next)
+                  );
+                }
+              }}
+              className="h-9 w-9 rounded-lg border border-sidebar-border/50 bg-sidebar-accent/60 text-sidebar-foreground/80 transition-all hover:bg-sidebar-accent"
+            >
               <ChevronRight className="h-4 w-4" />
-            ) : (
+              <span className="sr-only">Expand Sidebar</span>
+            </Button>
+          ) : (
+            <Button
+              variant="ghost"
+              onClick={() => {
+                const next = !isCollapsed;
+                setIsCollapsed(next);
+                if (typeof window !== "undefined") {
+                  window.localStorage.setItem(
+                    SIDEBAR_STATE_KEY,
+                    String(next)
+                  );
+                }
+              }}
+              className="w-full justify-center gap-2 rounded-xl border border-sidebar-border/50 bg-sidebar-accent text-sidebar-accent-foreground transition-colors hover:bg-sidebar-accent/90"
+            >
               <ChevronLeft className="h-4 w-4" />
-            )}
-            <span className="sr-only">Toggle Sidebar</span>
-          </Button>
+              Collapse
+            </Button>
+          )}
         </div>
       </div>
     </div>

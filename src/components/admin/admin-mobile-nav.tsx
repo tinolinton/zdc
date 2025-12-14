@@ -135,13 +135,13 @@ export function AdminMobileNav({ userName }: { userName?: string | null }) {
                       return (
                         <Link
                           key={item.href}
-                          href={item.href}
-                          className={cn(
-                            "flex items-center gap-4 rounded-xl px-4 py-3 text-sm font-medium transition-colors",
-                            isActive
-                              ? "bg-primary/10 text-primary"
-                              : "hover:bg-muted text-muted-foreground hover:text-foreground"
-                          )}
+                      href={item.href}
+                      className={cn(
+                        "flex items-center justify-center gap-4 rounded-xl px-4 py-3 text-sm font-medium text-center transition-colors",
+                        isActive
+                          ? "bg-primary/10 text-primary"
+                          : "hover:bg-muted text-muted-foreground hover:text-foreground"
+                      )}
                         >
                           <item.icon className="h-5 w-5" />
                           {item.title}
@@ -153,7 +153,7 @@ export function AdminMobileNav({ userName }: { userName?: string | null }) {
 
                     <Link
                       href="/"
-                      className="flex items-center gap-4 rounded-xl px-4 py-3 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
+                      className="flex items-center justify-center gap-4 rounded-xl px-4 py-3 text-sm font-medium text-center text-muted-foreground hover:bg-muted hover:text-foreground"
                     >
                       <Home className="h-5 w-5" />
                       Back to Site
@@ -161,7 +161,7 @@ export function AdminMobileNav({ userName }: { userName?: string | null }) {
 
                     <button
                       onClick={() => signOut({ callbackUrl: "/login" })}
-                      className="flex items-center gap-4 rounded-xl px-4 py-3 text-sm font-medium text-destructive hover:bg-destructive/10"
+                      className="flex items-center justify-center gap-4 rounded-xl px-4 py-3 text-sm font-medium text-center text-destructive hover:bg-destructive/10"
                     >
                       <LogOut className="h-5 w-5" />
                       Sign Out

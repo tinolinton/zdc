@@ -23,6 +23,7 @@ export default function TestPage({
 }) {
   const router = useRouter();
   const { type } = use(params);
+  const normalizedType = (type ?? "timed").toLowerCase();
   const [timeLeft, setTimeLeft] = useState(600); // 10 minutes in seconds
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [questions, setQuestions] = useState<
@@ -44,10 +45,17 @@ export default function TestPage({
   }, []);
 
   useEffect(() => {
+    setTimeLeft(600);
+    setCurrentQuestion(0);
+    setSelected({});
+
     const fetchQuestions = async () => {
-      const res = await fetch("/api/site/questions?take=25", {
-        cache: "no-store",
-      });
+      const res = await fetch(
+        `/api/site/questions?take=25&type=${encodeURIComponent(normalizedType)}`,
+        {
+          cache: "no-store",
+        }
+      );
       if (!res.ok) return;
       const data = await res.json();
       setQuestions(
@@ -67,7 +75,7 @@ export default function TestPage({
       );
     };
     fetchQuestions();
-  }, []);
+  }, [normalizedType]);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -99,7 +107,7 @@ export default function TestPage({
       const res = await fetch("/api/site/tests", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ responses, type }),
+        body: JSON.stringify({ responses, type: normalizedType }),
       });
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));

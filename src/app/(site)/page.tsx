@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/table";
 import { PlayCircle, RotateCcw } from "lucide-react";
 import Link from "next/link";
-import { auth } from "@/auth";
 import { cookies } from "next/headers";
 
 type TestResult = {
@@ -53,9 +52,6 @@ async function getTests(): Promise<TestSummary> {
 export default async function UserDashboard() {
   const { testsTaken, averageScorePercent, lastTest, results } =
     await getTests();
-  const session = await auth();
-  const role = session?.user?.role;
-  const isAdmin = role === "ADMIN" || role === "SUPERADMIN";
 
   return (
     <div className="container mx-auto px-6 py-12 space-y-8">
@@ -67,11 +63,6 @@ export default async function UserDashboard() {
             Take New Test
           </Link>
         </Button>
-        {isAdmin && (
-          <Link href="/admin">
-            <Button variant="outline">Admin Console</Button>
-          </Link>
-        )}
       </div>
 
       <div className="grid gap-6 md:grid-cols-3">

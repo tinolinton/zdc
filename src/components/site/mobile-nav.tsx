@@ -140,7 +140,7 @@ export function MobileNav({ links, isAdmin, userName }: MobileNavProps) {
                     <Link
                       href="/"
                       className={cn(
-                        "flex items-center gap-4 rounded-xl px-4 py-3 text-sm font-medium transition-colors",
+                        "flex items-center justify-center gap-4 rounded-xl px-4 py-3 text-sm font-medium text-center transition-colors",
                         pathname === "/"
                           ? "bg-primary/10 text-primary"
                           : "hover:bg-muted text-muted-foreground hover:text-foreground"
@@ -158,7 +158,7 @@ export function MobileNav({ links, isAdmin, userName }: MobileNavProps) {
                           key={link.href}
                           href={link.href}
                           className={cn(
-                            "flex items-center gap-4 rounded-xl px-4 py-3 text-sm font-medium transition-colors",
+                            "flex items-center justify-center gap-4 rounded-xl px-4 py-3 text-sm font-medium text-center transition-colors",
                             isActive
                               ? "bg-primary/10 text-primary"
                               : "hover:bg-muted text-muted-foreground hover:text-foreground"
@@ -174,17 +174,17 @@ export function MobileNav({ links, isAdmin, userName }: MobileNavProps) {
 
                     {isAdmin && (
                       <Link
-                        href="/admin"
-                        className="flex items-center gap-4 rounded-xl px-4 py-3 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
-                      >
-                        <Crown className="h-5 w-5" />
-                        Admin Panel
-                      </Link>
-                    )}
+                      href="/admin"
+                      className="flex items-center justify-center gap-4 rounded-xl px-4 py-3 text-sm font-medium text-center text-muted-foreground hover:bg-muted hover:text-foreground"
+                    >
+                      <Crown className="h-5 w-5" />
+                      Admin Panel
+                    </Link>
+                  )}
 
                     <button
                       onClick={() => signOut({ callbackUrl: "/login" })}
-                      className="flex items-center gap-4 rounded-xl px-4 py-3 text-sm font-medium text-destructive hover:bg-destructive/10"
+                      className="flex items-center justify-center gap-4 rounded-xl px-4 py-3 text-sm font-medium text-center text-destructive hover:bg-destructive/10"
                     >
                       <LogOut className="h-5 w-5" />
                       Sign Out
