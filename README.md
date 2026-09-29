@@ -45,7 +45,7 @@ Follow these steps to set up the project locally.
 
 ### Prerequisites
 
-- Node.js (v18 or higher)
+- Node.js (v20.9 or higher)
 - PostgreSQL database
 - Cloudinary account (for image uploads)
 
@@ -54,8 +54,8 @@ Follow these steps to set up the project locally.
 1. **Clone the repository**
 
    ```bash
-   git clone https://github.com/tinolinton/zimprovisional.git
-   cd zimprovisional
+   git clone https://github.com/tinolinton/zdc.git
+   cd zdc
    ```
 
 2. **Install dependencies**
