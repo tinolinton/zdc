@@ -1,14 +1,14 @@
-# ZimProvisional 🚗
+# ZimProvisional 
 
 **ZimProvisional** is a modern, full-stack web application designed to help students prepare for the Zimbabwean Provisional Driving Test. It provides a comprehensive platform for practicing test questions, tracking progress, and managing administrative tasks.
 
-🔗 **Live Demo:** [zdc.chimaliro.com](https://zdc.chimaliro.com)
+ **Live Demo:** [zdc.chimaliro.com](https://zdc.chimaliro.com)
 
 ---
 
-## 🚀 Features
+## Features
 
-### 👤 For Students
+### For Students
 
 - **Practice Tests**: Take timed or untimed practice tests with randomized questions.
 - **Instant Feedback**: Get immediate results with detailed explanations for correct and incorrect answers.
@@ -16,7 +16,7 @@
 - **Responsive Design**: Optimized for both desktop and mobile devices for on-the-go revision.
 - **User Dashboard**: Personalized dashboard showing recent activity and performance metrics.
 
-### 🛡️ For Admins
+### For Admins
 
 - **Dashboard**: Overview of system statistics (users, total tests, pass rates).
 - **Question Management**: Create, update, and delete questions with support for image uploads.
@@ -26,7 +26,7 @@
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 - **Framework**: [Next.js 16](https://nextjs.org/) (App Router)
 - **Language**: [TypeScript](https://www.typescriptlang.org/)
@@ -39,7 +39,7 @@
 
 ---
 
-## 🏁 Getting Started
+## Getting Started
 
 Follow these steps to set up the project locally.
 
@@ -53,81 +53,81 @@ Follow these steps to set up the project locally.
 
 1. **Clone the repository**
 
-   ```bash
-   git clone https://github.com/tinolinton/zdc.git
-   cd zdc
-   ```
+ ```bash
+ git clone https://github.com/tinolinton/zdc.git
+ cd zdc
+ ```
 
 2. **Install dependencies**
 
-   ```bash
-   npm install
-   ```
+ ```bash
+ npm install
+ ```
 
 3. **Environment Setup**
-   Create a `.env` file in the root directory and configure the following variables (see `env.example.txt` for reference):
+ Create a `.env` file in the root directory and configure the following variables (see `env.example.txt` for reference):
 
-   ```env
-   # Database
-   DATABASE_URL="postgresql://user:password@localhost:5432/zimprovisional?schema=public"
+ ```env
+ # Database
+ DATABASE_URL="postgresql://user:password@localhost:5432/zimprovisional?schema=public"
 
-   # Auth.js
-   AUTH_SECRET="your-secret-key"
-   AUTH_URL="http://localhost:3000"
+ # Auth.js
+ AUTH_SECRET="your-secret-key"
+ AUTH_URL="http://localhost:3000"
 
-   # Email (Nodemailer)
-   EMAIL_SERVER_USER="your-email@example.com"
-   EMAIL_SERVER_PASSWORD="your-password"
-   EMAIL_SERVER_HOST="smtp.example.com"
-   EMAIL_SERVER_PORT="587"
-   EMAIL_FROM="noreply@zimprovisional.com"
+ # Email (Nodemailer)
+ EMAIL_SERVER_USER="your-email@example.com"
+ EMAIL_SERVER_PASSWORD="your-password"
+ EMAIL_SERVER_HOST="smtp.example.com"
+ EMAIL_SERVER_PORT="587"
+ EMAIL_FROM="noreply@zimprovisional.com"
 
-   # Cloudinary
-   CLOUDINARY_URL="cloudinary://key:secret@cloud_name"
-   CLOUDINARY_UPLOAD_FOLDER="zimdrive"
-   ```
+ # Cloudinary
+ CLOUDINARY_URL="cloudinary://key:secret@cloud_name"
+ CLOUDINARY_UPLOAD_FOLDER="zimdrive"
+ ```
 
 4. **Database Setup**
-   Generate the Prisma client and push the schema to your database:
+ Generate the Prisma client and push the schema to your database:
 
-   ```bash
-   npx prisma generate
-   npx prisma db push
-   ```
+ ```bash
+ npx prisma generate
+ npx prisma db push
+ ```
 
-   Seed the database with initial data (default superadmin):
+ Seed the database with initial data (default superadmin):
 
-   ```bash
-   npm run prisma:seed
-   ```
+ ```bash
+ npm run prisma:seed
+ ```
 
-   > **Default Superadmin:** `dev@chimaliro.com`
+ > **Default Superadmin:** `dev@chimaliro.com`
 
 5. **Run the Application**
-   ```bash
-   npm run dev
-   ```
-   Open [http://localhost:3000](http://localhost:3000) in your browser.
+ ```bash
+ npm run dev
+ ```
+ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 
 ```
 src/
-├── app/              # Next.js App Router pages and layouts
-│   ├── (admin)/      # Admin dashboard routes
-│   ├── (auth)/       # Authentication routes (login, register)
-│   ├── (site)/       # Public and user-facing routes
-│   └── api/          # API routes
-├── components/       # Reusable UI components
-├── lib/              # Utility functions and libraries (Prisma, Auth)
-└── prisma/           # Database schema and seed scripts
+├── app/ # Next.js App Router pages and layouts
+│ ├── (admin)/ # Admin dashboard routes
+│ ├── (auth)/ # Authentication routes (login, register)
+│ ├── (site)/ # Public and user-facing routes
+│ └── api/ # API routes
+├── components/ # Reusable UI components
+├── lib/ # Utility functions and libraries (Prisma, Auth)
+└── prisma/ # Database schema and seed scripts
 ```
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
@@ -139,14 +139,14 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ---
 
-## ✍️ Author
+## Author
 
 **Tino Linton**
 
-- 🌐 **Portfolio**: [chimaliro.com](https://chimaliro.com)
-- 🐙 **GitHub**: [@tinolinton](https://github.com/tinolinton)
-- 🐦 **X (Twitter)**: [@chimaliroo](https://x.com/chimaliroo)
-- 📧 **Email**: [dev@chimaliro.com](mailto:dev@chimaliro.com)
+- **Portfolio**: [chimaliro.com](https://chimaliro.com)
+- **GitHub**: [@tinolinton](https://github.com/tinolinton)
+- **X (Twitter)**: [@chimaliroo](https://x.com/chimaliroo)
+- **Email**: [dev@chimaliro.com](mailto:dev@chimaliro.com)
 
 ---
 
